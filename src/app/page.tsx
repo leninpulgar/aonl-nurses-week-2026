@@ -10,7 +10,7 @@ export default function BadgeCreator() {
   const [profileImageName, setProfileImageName] = useState('');
   // const [name, setName] = useState('Your name and title');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  // Handle resizing of avatar image
+  // Handle resizing of avatar images
   const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
   const [imageScale, setImageScale] = useState(1);
 
@@ -38,12 +38,12 @@ export default function BadgeCreator() {
     const preventGesture = (e: TouchEvent) => {
       if (e.touches.length > 1) e.preventDefault();
     };
-  
+
     // Add event listeners for non-standard gesture events
     document.addEventListener("gesturestart", preventGesture as EventListener, { passive: false });
     document.addEventListener("gesturechange", preventGesture as EventListener, { passive: false });
     document.addEventListener("touchmove", preventGesture as EventListener, { passive: false });
-  
+
     return () => {
       document.removeEventListener("gesturestart", preventGesture as EventListener);
       document.removeEventListener("gesturechange", preventGesture as EventListener);
@@ -110,14 +110,14 @@ export default function BadgeCreator() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-  
+
     const wheelHandler = (e: WheelEvent) => {
       if (e.cancelable) e.preventDefault();
     };
-  
+
     // 🔐 Register wheel as non-passive to allow preventDefault()
     canvas.addEventListener('wheel', wheelHandler, { passive: false });
-  
+
     return () => {
       canvas.removeEventListener('wheel', wheelHandler);
     };
@@ -129,14 +129,14 @@ export default function BadgeCreator() {
     const scaleAmount = e.deltaY < 0 ? 0.05 : -0.05;
     setImageScale((prev) => Math.max(0.1, prev + scaleAmount));
   };
-  
+
 
 
   const handleResize = () => {
     const screenWidth = window.innerWidth;
     const maxWidth = 768;
     const aspectRatio = 768 / 960;
-  
+
     if (screenWidth < maxWidth) {
       setCanvasWidth(screenWidth - 20);
       setCanvasHeight((screenWidth - 20) / aspectRatio);
@@ -145,7 +145,7 @@ export default function BadgeCreator() {
       setCanvasHeight(maxWidth / aspectRatio);
     }
   };
-  
+
 
   useEffect(() => {
     handleResize(); // Set initial size
@@ -168,7 +168,7 @@ export default function BadgeCreator() {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-  
+
     const dpr = window.devicePixelRatio || 1;
     canvas.width = 768 * dpr;
     canvas.height = 960 * dpr;
@@ -177,12 +177,12 @@ export default function BadgeCreator() {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
     ctx.clearRect(0, 0, 768, 960);
-  
+
     const background = new Image();
     background.src = '/Template Post_empty.png';
     background.onload = () => {
       ctx.drawImage(background, 0, 0, 768, 960);
-  
+
       if (profileImage) {
         const profile = new Image();
         profile.src = profileImage;
@@ -191,13 +191,13 @@ export default function BadgeCreator() {
           const circleX = 500; // centro horizontal (768/2)
           const circleY = 595; // ajusta según tu plantilla
           const radius = 240;
-  
+
           // Calcula dimensiones de la imagen cargada
           const imgRatio = profile.width / profile.height;
           const boxSize = radius * 2;
           let drawW = boxSize;
           let drawH = boxSize;
-  
+
           if (imgRatio > 1) {
             drawH = boxSize;
             drawW = boxSize * imgRatio;
@@ -205,28 +205,28 @@ export default function BadgeCreator() {
             drawW = boxSize;
             drawH = boxSize / imgRatio;
           }
-  
+
           const dx = circleX - drawW / 2 + imageOffset.x;
           const dy = circleY - drawH / 2 + imageOffset.y;
-  
+
           // 🔒 Clipping circular
           ctx.save();
           ctx.beginPath();
           ctx.arc(circleX, circleY, radius, 0, Math.PI * 2, true);
           ctx.clip();
-  
+
           // Dibuja imagen escalada dentro del clip
           ctx.drawImage(
             profile,
             0, 0, profile.width, profile.height,
             dx, dy, drawW * imageScale, drawH * imageScale
           );
-  
+
           ctx.restore(); // Libera el recorte
         };
       }
     };
-  };  
+  };
 
   useEffect(() => {
     drawCanvas();
@@ -261,7 +261,7 @@ export default function BadgeCreator() {
           className="hidden"
         />
       </div>
-      
+
       <div className="relative border-[3px] border-gray-200 bg-white rounded-lg overflow-hidden shadow-md p-6">
         <canvas
           ref={canvasRef}
